@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BizQuick Invoices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Biz<span>Quick</span></div>
+  <div class="actions">
+    <button type="button" id="btnNew" class="btn ghost">New invoice</button>
+    <button type="button" id="btnPrint" class="btn ghost">Print</button>
+    <button type="button" id="btnPdf" class="btn primary">Download PDF</button>
+  </div>
+</header>
+
+<div id="errors" class="errors" hidden></div>
+
+<main class="layout">
+  <!-- ============ FORM ============ -->
+  <section class="form" id="form" autocomplete="off">
+
+    <fieldset>
+      <legend>Invoice</legend>
+      <div class="grid2">
+        <div class="field">
+          <label>PO No.</label>
+          <div class="seg" data-group="poType">
+            <label><input type="radio" name="poType" value="Verbal" checked> Verbal</label>
+            <label><input type="radio" name="poType" value="Written"> Written</label>
+          </div>
+        </div>
+        <div class="field" id="poNumberField" hidden>
+          <label for="poNumber">PO number <small>digits, max 10</small></label>
+          <input id="poNumber" data-f="poNumber" data-rule="digits" maxlength="10" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label>Reverse Charge</label>
+          <div class="seg" data-group="reverseCharge">
+            <label><input type="radio" name="reverseCharge" value="Yes"> Yes</label>
+            <label><input type="radio" name="reverseCharge" value="No" checked> No</label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="invoiceNo">Invoice No. <small>e.g. 034/2026-27</small></label>
+          <input id="invoiceNo" data-f="invoiceNo" maxlength="30">
+        </div>
+        <div class="field">
+          <label for="invoiceDate">Invoice Date</label>
+          <input id="invoiceDate" data-f="invoiceDate" type="date">
+        </div>
+        <div class="field">
+          <label for="state">State <small>letters, max 20</small></label>
+          <input id="state" data-f="state" data-rule="alpha" maxlength="20">
+        </div>
+        <div class="field">
+          <label for="stateCode">State Code</label>
+          <input id="stateCode" data-f="stateCode" data-rule="digits" maxlength="2" inputmode="numeric">
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Transport</legend>
+      <div class="grid2">
+        <div class="field">
+          <label for="transportMode">Transportation Mode</label>
+          <select id="transportMode" data-f="transportMode">
+            <option value="">—</option>
+            <option>Air</option>
+            <option>Ship</option>
+            <option>Road</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="vehicleNumber">Vehicle Number <small>letters/digits, max 20</small></label>
+          <input id="vehicleNumber" data-f="vehicleNumber" data-rule="alnum" maxlength="20">
+        </div>
+        <div class="field">
+          <label for="dateOfSupply">Date of Supply</label>
+          <input id="dateOfSupply" data-f="dateOfSupply" type="date">
+        </div>
+        <div class="field">
+          <label for="placeOfSupply">Place of Supply <small>letters, max 20</small></label>
+          <input id="placeOfSupply" data-f="placeOfSupply" data-rule="alpha" maxlength="20">
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Details of Receiver / Billed to</legend>
+      <div class="grid2">
+        <div class="field span2"><label>Name</label><input data-f="billName" maxlength="60"></div>
+        <div class="field span2"><label>Address <small>up to 4 lines</small></label><textarea data-f="billAddress" rows="3" data-maxlines="4"></textarea></div>
+        <div class="field"><label>State</label><input data-f="billState" maxlength="25"></div>
+        <div class="field"><label>State Code</label><input data-f="billStateCode" data-rule="digits" maxlength="2" inputmode="numeric"></div>
+        <div class="field span2"><label>GSTIN</label><input data-f="billGstin" data-rule="gstin" maxlength="15"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Details of Consignee / Shipped to</legend>
+      <label class="check"><input type="checkbox" id="sameAsBill"> Same as Billed to</label>
+      <div class="grid2" id="shipFields">
+        <div class="field span2"><label>Name</label><input data-f="shipName" maxlength="60"></div>
+        <div class="field span2"><label>Address <small>up to 4 lines</small></label><textarea data-f="shipAddress" rows="3" data-maxlines="4"></textarea></div>
+        <div class="field"><label>State</label><input data-f="shipState" maxlength="25"></div>
+        <div class="field"><label>State Code</label><input data-f="shipStateCode" data-rule="digits" maxlength="2" inputmode="numeric"></div>
+        <div class="field span2"><label>GSTIN</label><input data-f="shipGstin" data-rule="gstin" maxlength="15"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Products / Services</legend>
+      <p class="hint">Press <kbd>Enter</kbd> to add the next item. <kbd>Shift</kbd>+<kbd>Enter</kbd> adds a second line to a product name. Leave a tax rate empty to skip that tax.</p>
+      <div id="items"></div>
+      <button type="button" id="btnAddItem" class="btn ghost small">+ Add item</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Other</legend>
+      <div class="grid2">
+        <div class="field span2">
+          <label for="ewayBill">E-way Bill No. <small>optional</small></label>
+          <input id="ewayBill" data-f="ewayBill" maxlength="20">
+        </div>
+      </div>
+    </fieldset>
+
+    <details class="settings">
+      <summary>Bank details (saved on this device only)</summary>
+      <div class="grid2">
+        <div class="field"><label for="bankAccount">Account No.</label><input id="bankAccount" data-s="bankAccount" data-rule="digits" maxlength="20" inputmode="numeric"></div>
+        <div class="field"><label for="bankIfsc">IFSC Code</label><input id="bankIfsc" data-s="bankIfsc" data-rule="alnum" maxlength="11"></div>
+      </div>
+      <p class="hint">These print on every invoice. They're stored in this browser, not in the code on GitHub.</p>
+    </details>
+  </section>
+
+  <!-- ============ PREVIEW ============ -->
+  <section class="preview-wrap">
+    <div class="preview-scale" id="previewScale">
+      <div id="preview"></div>
+    </div>
+  </section>
+</main>
+
+<div id="pdfStage" aria-hidden="true"></div>
+<div id="printArea" aria-hidden="true"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
