@@ -4,7 +4,7 @@ PDF invoice generator for **BILLSONS INDIA**. Fill in a form, see the invoice up
 
 ## How to use
 
-**Online:** open https://kaustubha-voh.github.io/bizquick/ (once GitHub Pages is enabled — see below).
+**Online:** open https://kaustubha-voh.github.io/BizQuick/ (once GitHub Pages is enabled — see below).
 
 **On your computer:** download this repo (green **Code** button → **Download ZIP**), unzip it, and double-click `index.html`. It opens in your browser; nothing to install.
 
